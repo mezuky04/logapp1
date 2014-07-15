@@ -81,13 +81,18 @@ class AccountController extends BaseController {
         }
 
         // Email exists, check the password now
-        $user =
-        if (!Hash::check($password, $passwordHash)) {
+        $user = $usersModel->getOne(array('UserId', 'Email', 'Password'), array('Email' => $email));
+        if (!Hash::check($password, $user->Password)) {
             return View::make($this->_loginView, array('invalidLogin' => true));
         }
 
         // Valid credentials, log in user
+        Session::put(array(
+            'UserId' => $user->UserId,
+            'Email' => $user->Email,
+        ));
 
+        return Redirect::to('home');
     }
 
     public function processRegister() {

@@ -147,7 +147,10 @@ class BaseModel {
         }
     }
 
-
+    /**
+     *
+     * OLD FROM HERE ----------------------------------`
+     */
 
     /**
      * Get all records from db table that match the given filter

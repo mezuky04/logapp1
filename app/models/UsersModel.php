@@ -17,10 +17,34 @@ class UsersModel {
     protected $_tableFields = array('UserId', 'Email', 'Password');
 
     /**
-     * @param array $where  key => value , only one array element
+     * Get one record from database that match the given filter
+     *
+     * @param array $fields
+     * @param array $filter key => value
      */
-    public function get($where = array()) {
+    public function getOne($fields = array(), $filter = array()) {
 
+        $query = DB::table($this->_tableName);
+
+        // Set select fields
+        if (isset($fields[0])) {
+            $query->select($fields[0]);
+        }
+        for ($i = 1; $i < count($fields); $i++) {
+            $query->select($fields[$i]);
+        }
+
+        // No filter
+        if (!count($filter)) {
+            return $query->first();
+        }
+
+        // Set filter and return result
+        foreach ($filter as $key => $value) {
+            $query->where($key, $value);
+        }
+
+        return $query->first();
     }
 
 
