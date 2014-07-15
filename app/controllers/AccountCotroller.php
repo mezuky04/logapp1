@@ -24,7 +24,14 @@ class AccountController extends BaseController {
      * Display login page or redirect to homepage if user is already logged in
      */
     public function showLoginPage() {
-        //
+
+        // Redirect logged in users
+        if ($this->_loggedIn) {
+            return Redirect::to('home');
+        }
+
+        // Render view
+        return View::make($this->_loginView);
     }
 
 
@@ -32,7 +39,14 @@ class AccountController extends BaseController {
      * Display register page or redirect to homepage if user is already logged in
      */
     public function showRegisterPage() {
-        //
+
+        // Redirect logged in users
+        if ($this->_loggedIn) {
+            return Redirect::to('home');
+        }
+
+        // Render view
+        return View::make($this->_registerView);
     }
 
     public function processLogin() {

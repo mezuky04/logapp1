@@ -34,6 +34,7 @@ class BaseController extends Controller {
         $this->_setUserInfo();
     }
 
+
 	/**
 	 * Setup the layout used by the controller.
 	 *
