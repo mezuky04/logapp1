@@ -50,7 +50,44 @@ class AccountController extends BaseController {
     }
 
     public function processLogin() {
-        //
+
+        // Redirect logged in users
+        if ($this->_loggedIn) {
+            return Redirect::to('home');
+        }
+
+        // Get login details
+        $email = Input::get('email');
+        $password = Input::get('password');
+
+        // Check for email and password to not be empty
+        if (empty($email)) {
+            return View::make($this->_loginView, array('emptyEmail' => true));
+        }
+        if (empty($password)) {
+            return View::make($this->_loginView, array('emptyPassword' => true));
+        }
+
+        // Invalid email
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return View::make($this->_loginView, array('invalidEmail' => true));
+        }
+
+        $usersModel = new UsersModel();
+
+        // Check if given email exists in database
+        if (!$usersModel->check('Email', $email)) {
+            return View::make($this->_loginView, array('invalidLogin' => true));
+        }
+
+        // Email exists, check the password now
+        $user =
+        if (!Hash::check($password, $passwordHash)) {
+            return View::make($this->_loginView, array('invalidLogin' => true));
+        }
+
+        // Valid credentials, log in user
+
     }
 
     public function processRegister() {

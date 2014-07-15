@@ -36,28 +36,118 @@ class BaseModel {
     /**
      * Get one record from database that match the given filter
      *
-     * @param array $fields optional Fields to return
-     * @param array $filter optional key => value
-     * @return array
+     * @param array $fields To return
+     * @param array $filter key => value
+     * @return object Query result
      */
     public function getOne($fields = array(), $filter = array()) {
+        return $this->_get(true, $fields, $filter);
+    }
 
-        // Clean fields
-        $this->_cleanFields($filter);
+
+    /**
+     * Get all records from database that match the given filter
+     *
+     * @param array $fields To return
+     * @param array $filter key => value
+     * @return array Query results
+     */
+    public function getAll($fields = array(), $filter = array()) {
+        return $this->_get(false, $fields, $filter);
+    }
+
+
+    /**
+     * Insert new record in database
+     *
+     * @param array $record key => value
+     */
+    public function insert($record = array()) {
+
+        // Clean record fields
+        $this->_cleanFields($record);
+
+        // Insert record and return insert id
+        return DB::table($this->_tableName)->insertGetId($record);
+    }
+
+
+    /**
+     * Insert multiple records
+     *
+     * @param array $records An array of arrays
+     */
+    public function insertMultiple($records = array()) {
+
+        // Clean all records
+        foreach ($records as $record) {
+            $this->_cleanFields($record);
+        }
+
+        // Insert records
+        DB::table($this->_tableName)->insert($records);
+    }
+
+
+    /**
+     * Get records from database
+     *
+     * @param bool $getOne
+     * @param array $fields
+     * @param array $filter
+     * @return mixed
+     */
+    private function _get($getOne = false, $fields = array(), $filter = array()) {
+
+        // Remove unknown fields from select fields
         $fields = array_flip($fields);
         $this->_cleanFields($fields);
+        $fields = array_flip($fields);
 
-        $fieldsToSelect = count($fields) ? implode(',', array_keys($fields)) : '*';
+        // Remove unknown fields from filter
+        $this->_cleanFields($filter);
 
         // Build query
-        $sql = "SELECT {$fieldsToSelect} FROM {$this->_tableName}";
-        $sql .= $this->_buildWhere($filter);
-        $sql .= ' LIMIT 0,1';
-        print_r($sql);
-        // todo check if an array of results is returned and return only an array with required fields
-        //DB::select('select * from Users WHERE UserId = ?', array(1));
-        return DB::select($sql, $filter);
+        $query = DB::table($this->_tableName);
+
+        // Check if select fields exists
+        if (isset($fields[0])) {
+            $query->select($fields[0]);
+        }
+        foreach ($fields as $field) {
+            $query->addSelect($field);
+        }
+
+        // Add where clause
+        if (count($filter)) {
+            foreach ($filter as $fieldKey => $fieldValue) {
+                $query->where($fieldKey, $fieldValue);
+            }
+        }
+
+        // Check if should be returned first result or all results
+        if (isset($getOne)) {
+            return $query->first();
+        }
+
+        return $query->get();
     }
+
+    /**
+     * Remove unknown table fields from the given array
+     *
+     * @param array $fields
+     */
+    private function _cleanFields(&$fields) {
+
+        foreach (array_keys($fields) as $field) {
+            if (!array_key_exists($field, $this->_tableFields)) {
+                unset($fields[$field]);
+            }
+        }
+    }
+
+
 
     /**
      * Get all records from db table that match the given filter
@@ -146,19 +236,6 @@ class BaseModel {
         $sql .= $this->_buildWhere($filter);
 
         return DB::delete($sql, $filter);
-    }
-
-    /**
-     * Remove unknown fields
-     *
-     * @param $fields
-     */
-    protected function _cleanFields(&$fields) {
-        foreach(array_keys($fields) as $fieldName) {
-            if (!in_array($fieldName, $this->_tableFields)) {
-                unset($fields[$fieldName]);
-            }
-        }
     }
 
     /**
