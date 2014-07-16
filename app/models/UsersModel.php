@@ -49,6 +49,27 @@ class UsersModel {
 
 
     /**
+     * Insert new user in database
+     *
+     * @param string $email
+     * @param string $password
+     * @return array With user information
+     */
+    public function saveUser($email, $password) {
+        $user = array(
+            'Email' => $email,
+            'Password' => Hash::make($password)
+        );
+        $userId = DB::table($this->_tableName)->insertGetId($user);
+
+        return array(
+            'UserId' => $userId,
+            'Email' => $email
+        );
+    }
+
+
+    /**
      * Check if given field exists in database
      *
      * @param string $fieldName

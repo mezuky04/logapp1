@@ -49,6 +49,12 @@ class AccountController extends BaseController {
         return View::make($this->_registerView);
     }
 
+
+    /**
+     * Handle users login
+     *
+     * @return mixed
+     */
     public function processLogin() {
 
         // Redirect logged in users
@@ -95,7 +101,102 @@ class AccountController extends BaseController {
         return Redirect::to('home');
     }
 
+
+    /**
+     * Handle users registration
+     *
+     * @return mixed
+     */
     public function processRegister() {
+
+        // Redirect logged in users
+        if ($this->_loggedIn) {
+            return Redirect::to('home');
+        }
+
+        $email = Input::get('email');
+        $password = Input::get('password');
+
+        // Check if all fields was completed
+        if (empty($email)) {
+            return View::make($this->_registerView, array('emptyEmail' => true));
+        }
+        if (empty($password)) {
+            return View::make($this->_registerView, array('emptyPassword' => true));
+        }
+
+        // Check if email is valid
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return View::make($this->_registerView, array('invalidEmail' => true));
+        }
+
+        // Check for password length
+        if (strlen($password) < 8) {
+            return View::make($this->_registerView, array('tooShortPassword' => true));
+        }
+
+        // Check if email is already used
+        $usersModel = new UsersModel();
+        if ($usersModel->getOne(array('Email'), array('Email' => $email))) {
+            return View::make($this->_registerView, array('alreadyUsedEmail' => true));
+        }
+
+        // Insert user information in database
+        $user = $usersModel->saveUser($email, $password);
+
+        // Send verification email
+
+        // Make user logged in
+        Session::put($user);
+    }
+
+
+    /**
+     * Generate api key
+     */
+    public function generateAPIKey() {
+
+        // Redirect not logged in users
+        if (!$this->_loggedIn) {
+            return Redirect::to('home');
+        }
+
+        // Generate and save api key
+        $apiKeysModel = new ApiKeysModel();
+        $apiKeysModel->generateAPIKey($this->_userId);
+    }
+
+
+    /**
+     * Generate a new api key and delete the old one
+     */
+    public function regenerateAPIKey($oldApiKey) {
+
+        // Redirect not logged in users
+        if (!$this->_loggedIn) {
+            return Redirect::to('home');
+        }
+
+        // Delete old api key
+        $apiKeysModel = new ApiKeysModel();
+        $apiKeysModel->deleteApiKey($oldApiKey);
+
+        // Generate new api key
+        $apiKeysModel->generateAPIKey($this->_userId);
+    }
+
+    /**
+     * Log user out
+     */
+    public function logout() {
+        //
+    }
+
+
+    /**
+     * Delete user account
+     */
+    public function deleteAccount() {
         //
     }
 }
