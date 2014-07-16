@@ -199,4 +199,28 @@ class AccountController extends BaseController {
     public function deleteAccount() {
         //
     }
+
+
+    /**
+     * Log in database information about login
+     */
+    private function logLogin() {
+        //
+    }
+
+
+    /**
+     * Log in database information about register process
+     */
+    private function logRegister() {
+        //
+    }
+
+
+    /**
+     *
+     */
+    private function logPasswordRecover() {
+        //
+    }
 }

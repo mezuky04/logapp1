@@ -1,11 +1,30 @@
 <?php
 
+/**
+ * Class ContactController
+ *
+ * Contact page
+ *
+ * @author Alexandru Bugarin <alexandru.bugarin@gmail.com>
+ */
 class ContactController extends BaseController {
 
+    /**
+     * @var string Contact view name
+     */
     private $_contactView = 'contact';
 
+    /**
+     * @var string Contact setting name
+     */
     private $_contactConfig = 'contact.';
 
+
+    /**
+     * Display contact page
+     *
+     * @return mixed
+     */
     public function displayContactPage() {
 
         // Display only contact page for not logged in users
@@ -68,5 +87,21 @@ class ContactController extends BaseController {
         // todo add a captcha
 
         // Send email
+    }
+
+
+    /**
+     * Log in database information about contact message
+     */
+    private function _logContactMessage() {
+        //
+    }
+
+
+    /**
+     * Log in database information about a failed contact message
+     */
+    private function _logFailedContactMessage() {
+        //
     }
 }
